@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Application.Service.OrderDTOs
+namespace Application.Service.OrderService.OrderDTOs
 {
     public class OrderItemDto
     {
-        public int ProductId { get; set; }
+        public Guid ProductId { get; set; }
         public int Quantity { get; set; }
     }
 }

@@ -23,13 +23,13 @@ namespace Infrastructure.Repositories
             _context.SaveChanges();
         }
 
-        public List<T> GetAll()
+        public IQueryable<T> GetAll()
         {
-            var data = _dbSet.ToList();
+            var data = _dbSet.AsQueryable();
             return data;
         }
 
-        public T GetById(int id)
+        public T GetById(Guid id)
         {
             var user = _dbSet.Find(id);
             return user;
@@ -41,6 +41,12 @@ namespace Infrastructure.Repositories
             _context.SaveChanges();
 
         }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+
         public void Update(T input)
         {
             _dbSet.Update(input);

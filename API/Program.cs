@@ -1,9 +1,17 @@
 using Application.Repository;
-using Application.Service;
+using Application.Service.CompanyService;
+using Application.Service.OrderDetailServices;
+using Application.Service.OrderDetailService.OrderDetailService;
+using Application.Service.OrderServices;
+using Application.Service.ProductServices;
+using Application.Service.UserSrvice;
 using Infrastructure.Context;
+using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Application.Service.OrderService.OrderService;
+using Application.Service.ProductService.ProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +38,9 @@ builder.Services.AddScoped(typeof(IProductService), typeof(ProductService));
 
 
 var app = builder.Build();
+UserSeedData.UserSeed(app.Services);
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 

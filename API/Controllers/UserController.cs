@@ -1,28 +1,29 @@
-﻿using Application.Service;
+﻿using Application.Service.UserSrvice;
+using Application.Service.UserSrvice.UserDTO;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class usersController : ControllerBase
     {
         private IUserService _userService;
-        public UserController (IUserService userService)
+        public usersController (IUserService userService)
         {
 
             _userService = userService;
         }
-        [HttpGet("GetUsers")]
+        [HttpGet]
         public IActionResult GetUsers()
         {
             var users = _userService.GetUsers();
             return Ok(users);
         }
-        [HttpGet("GetUser/{id}")]
-        public IActionResult GetUser(int id)
+        [HttpGet("{id}")]
+        public IActionResult GetUser(Guid id)
         {
             var user = _userService.GetUser(id);
             if (user != null)
@@ -34,20 +35,20 @@ namespace API.Controllers
                 return NotFound();
             }
         }
-        [HttpPost("AddUser")]
-        public IActionResult AddUser ([FromBody]User input)
+        [HttpPost]
+        public IActionResult AddUser ([FromBody]InsertUserDto input)
         {
             _userService.InsertUser(input);
             return Ok();
         }
-        [HttpPut("UpdateUser/{id}")]
-        public IActionResult EditUser (int id,[FromBody]User input)
+        [HttpPut("{id}")]
+        public IActionResult EditUser (Guid id,[FromBody]InsertUserDto input)
         {
             _userService.UpdateUser(id,input);
             return Ok();
         }
-        [HttpDelete("DeleteUser/{id}")]
-        public IActionResult DeleteUser (int id)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteUser (Guid id)
         {
             _userService.DeleteUser(id);
             return Ok();

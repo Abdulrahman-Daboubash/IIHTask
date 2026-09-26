@@ -1,30 +1,30 @@
-﻿using Application.Service;
+﻿using Application.Service.OrderDetailService.OrderDetailService;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
-    public class OrderDetailController : ControllerBase
+    public class ordersDetailController : ControllerBase
     {
         private readonly IOrderDetailService _orderDetailService;
 
-        public OrderDetailController(IOrderDetailService orderDetailService)
+        public ordersDetailController(IOrderDetailService orderDetailService)
         {
             _orderDetailService = orderDetailService;
         }
 
-        [HttpGet("GetOrderDetails")]
+        [HttpGet]
         public IActionResult GetOrderDetails()
         {
             var details = _orderDetailService.GetOrderDetails();
             return Ok(details);
         }
 
-        [HttpGet("GetOrderDetail/{id}")]
-        public IActionResult GetOrderDetail(int id)
+        [HttpGet("{id}")]
+        public IActionResult GetOrderDetail(Guid id)
         {
             var detail = _orderDetailService.GetOrderDetail(id);
             if (detail == null)
@@ -34,25 +34,25 @@ namespace API.Controllers
             return Ok(detail);
         }
 
-        [HttpGet("GetDetailsByOrderId/{orderId}")]
-        public IActionResult GetDetailsByOrderId(int orderId)
+        [HttpGet("{orderId}")]
+        public IActionResult GetDetailsByOrderId(Guid orderId)
         {
             var details = _orderDetailService.GetDetailsByOrderId(orderId);
             return Ok(details);
         }
 
-        [HttpPut("UpdateOrderDetail/{id}")]
-        public IActionResult UpdateOrderDetail(int id, [FromBody] OrderDetail orderDetail)
+        [HttpPut("{id}")]
+        public IActionResult UpdateOrderDetail(Guid id, [FromBody] OrderDetail orderDetail)
         {
             _orderDetailService.UpdateOrderDetail(id, orderDetail);
-            return Ok(new { message = "تم تحديث تفاصيل الطلب بنجاح." });
+            return Ok();
         }
 
-        [HttpDelete("DeleteOrderDetail/{id}")]
-        public IActionResult DeleteOrderDetail(int id)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteOrderDetail(Guid id)
         {
             _orderDetailService.DeleteOrderDetail(id);
-            return Ok(new { message = "تم حذف تفاصيل الطلب بنجاح." });
+            return Ok();
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿using Application.Repository;
+using Application.Service.OrderDetailService.OrderDetailService;
+using Application.Service.OrderDetailServices.OrderDetailDTO;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
 
-namespace Application.Service
+namespace Application.Service.OrderDetailServices
 {
     public class OrderDetailService : IOrderDetailService
     {
@@ -14,7 +17,7 @@ namespace Application.Service
         {
             _orderDetailRepository = orderDetailRepository;
         }
-        public void DeleteOrderDetail(int id)
+        public void DeleteOrderDetail(Guid id)
         {
             var detail = _orderDetailRepository.GetById(id);
             if (detail != null)
@@ -23,19 +26,28 @@ namespace Application.Service
             }
         }
 
-        public OrderDetail GetOrderDetail(int id)
+        public OrderDetail GetOrderDetail(Guid id)
         {
             var detail = _orderDetailRepository.GetById(id);
             return detail;
         }
 
-        public List<OrderDetail> GetOrderDetails()
+        public IQueryable<OrderDetailDto> GetOrderDetails()
         {
             var details = _orderDetailRepository.GetAll();
-            return details;
+            var result = details.Select(x => new OrderDetailDto
+            {
+                Id = x.Id,
+                OrderId = x.OrderId,
+                ProductId = x.ProductId,
+                Quantity = x.Quantity,
+                Price = x.Price
+
+            });
+            return result;
         }
 
-        public List<OrderDetail> GetDetailsByOrderId(int orderId)
+        public List<OrderDetail> GetDetailsByOrderId(Guid orderId)
         {
             var details = _orderDetailRepository.GetAll()
                 .Where(od => od.OrderId == orderId)
@@ -43,17 +55,19 @@ namespace Application.Service
 
             return details;
         }
-        public void UpdateOrderDetail(int id, OrderDetail orderDetail)
+        public void UpdateOrderDetail(Guid id, OrderDetail orderDetail)
         {
             var x = _orderDetailRepository.GetById(id);
             if (x != null)
             {
-                x.OrderId = orderDetail.OrderId;
-                x.ProductId = orderDetail.ProductId;
-                x.Quantity = orderDetail.Quantity;
-                x.Price = orderDetail.Price;
                 
-                _orderDetailRepository.Update(x);
+                    x.OrderId = orderDetail.OrderId;
+                    x.ProductId = orderDetail.ProductId;
+                    x.Quantity = orderDetail.Quantity;
+                    x.Price = orderDetail.Price;
+
+                    _orderDetailRepository.Update(x);
+                
             }
         }
     }

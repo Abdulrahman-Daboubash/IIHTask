@@ -7,9 +7,9 @@ namespace Domain.Entities
 {
     public class Order
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public decimal? TotalPrice { get; set; }
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         [ForeignKey("UserId")]
         public User user { get; set; }
     }

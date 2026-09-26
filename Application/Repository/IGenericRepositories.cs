@@ -6,11 +6,12 @@ namespace Application.Repository
 {
     public interface IGenericRepository<T> where T : class
     {
-        public List<T> GetAll();
-        public T GetById(int id);
+        public IQueryable<T> GetAll();
+        public T GetById(Guid id);
         public void Insert(T input);
         public void Update(T input);
         public void Delete(T input);
+        public void SaveChanges();
        
     }
 }
