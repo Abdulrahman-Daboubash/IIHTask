@@ -2,10 +2,14 @@
 using Application.Service.OrderService.OrderDTOs;
 using Application.Service.OrderService.OrderService;
 using Application.Service.OrderServices.OrderDTOs;
+using Dapper;
 using Domain.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Application.Service.OrderServices
@@ -15,11 +19,14 @@ namespace Application.Service.OrderServices
         private readonly IGenericRepository<Order> _orderRepository;
         private readonly IGenericRepository<OrderDetail> _orderDetailRepository;
         private readonly IGenericRepository<Product> _productRepository;
-        public OrderService(IGenericRepository<Order> orderRepository , IGenericRepository<OrderDetail> orderDetailRepository, IGenericRepository<Product> productRepository)
+        private readonly string? _connectionString;
+
+        public OrderService(IGenericRepository<Order> orderRepository , IGenericRepository<OrderDetail> orderDetailRepository, IGenericRepository<Product> productRepository, IConfiguration configuration)
         {
             _orderRepository = orderRepository;
             _orderDetailRepository = orderDetailRepository;
             _productRepository = productRepository;
+            _connectionString = configuration.GetConnectionString("Default");
         }
 
         public IQueryable<OrderDto> GetOrders()
@@ -58,33 +65,25 @@ namespace Application.Service.OrderServices
 
         public void CreateOrder(CreateOrderDto dto)
         {
-            var order = new Order()
+            var table = new DataTable();
+            table.Columns.Add("ProductId", typeof(Guid));
+            table.Columns.Add("Quantity", typeof(int));
+
+            foreach (var item in dto.Items)
             {
-                UserId = dto.UserId
-            };
-            _orderRepository.Insert(order);
-            foreach(var item in dto.Items)
-            {
-                var product =_productRepository.GetById(item.ProductId);
-                decimal price = product.Price;
-                var orderDetail = new OrderDetail()
-                {
-                    OrderId = order.Id,
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    Price = price
-                   
-                };
-                _orderDetailRepository.Insert(orderDetail);
+                table.Rows.Add(item.ProductId, item.Quantity);
             }
-            var x = _orderDetailRepository.GetAll().Where(o => o.OrderId == order.Id).ToList();
-            decimal totalPrice = 0;
-            foreach(var item in x)
+
+           
+            using (var connection = new SqlConnection(_connectionString))
             {
-                totalPrice += (item.Price * item.Quantity);
+                var parameters = new DynamicParameters();
+                parameters.Add("@UserId", dto.UserId);
+                parameters.Add("@Items", table.AsTableValuedParameter("dbo.OrderDetailType"));
+
+                
+                connection.Execute("sp_CreateOrder", parameters, commandType: CommandType.StoredProcedure);
             }
-            order.TotalPrice = totalPrice;
-            _orderRepository.SaveChanges();
         }
         public void UpdateOrder(Guid id, Order order)
         {
